@@ -1,0 +1,55 @@
+{
+  "type": "FRAME",
+  "name": "GlowingCTAButton",
+  "layout": {
+    "layoutMode": "HORIZONTAL",
+    "padding": { "top": 14, "bottom": 14, "left": 24, "right": 24 },
+    "itemSpacing": 10,
+    "primaryAxisAlignItems": "CENTER",
+    "counterAxisAlignItems": "CENTER",
+    "primaryAxisSizingMode": "AUTO",
+    "counterAxisSizingMode": "AUTO"
+  },
+  "style": {
+    "fills": [
+      {
+        "type": "SOLID",
+        "color": "#6366F1"
+      }
+    ],
+    "cornerRadius": 12,
+    "effects": [
+      {
+        "type": "DROP_SHADOW",
+        "color": "#6366F180",
+        "offset": { "x": 0, "y": 8 },
+        "radius": 24
+      }
+    ]
+  },
+  "children": [
+    {
+      "type": "TEXT",
+      "name": "Icon",
+      "text": {
+        "content": "✨",
+        "typography": {
+          "fontSize": 16
+        }
+      }
+    },
+    {
+      "type": "TEXT",
+      "name": "Label",
+      "text": {
+        "content": "Generate with AI",
+        "color": "#FFFFFF",
+        "typography": {
+          "fontFamily": "Inter",
+          "fontWeight": "Bold",
+          "fontSize": 15
+        }
+      }
+    }
+  ]
+}

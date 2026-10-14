@@ -1,0 +1,155 @@
+{
+  "type": "FRAME",
+  "name": "ButtonVariantsShowcase",
+  "width": 680,
+  "layout": {
+    "layoutMode": "VERTICAL",
+    "padding": 28,
+    "itemSpacing": 24,
+    "primaryAxisAlignItems": "MIN",
+    "counterAxisAlignItems": "MIN",
+    "primaryAxisSizingMode": "AUTO",
+    "counterAxisSizingMode": "AUTO"
+  },
+  "style": {
+    "fills": [
+      {
+        "type": "SOLID",
+        "color": "#09090B"
+      }
+    ],
+    "strokes": [
+      {
+        "type": "SOLID",
+        "color": "#27272A"
+      }
+    ],
+    "strokeWeight": 1,
+    "cornerRadius": 16,
+    "effects": [
+      {
+        "type": "DROP_SHADOW",
+        "color": "#00000066",
+        "offset": { "x": 0, "y": 12 },
+        "radius": 32
+      }
+    ]
+  },
+  "children": [
+    {
+      "type": "FRAME",
+      "name": "HeaderSection",
+      "layout": {
+        "layoutMode": "VERTICAL",
+        "itemSpacing": 6
+      },
+      "style": { "fills": [] },
+      "children": [
+        {
+          "type": "TEXT",
+          "name": "Title",
+          "text": {
+            "content": "Modern Button Design System",
+            "color": "#FAFAFA",
+            "typography": {
+              "fontFamily": "Inter",
+              "fontWeight": "Bold",
+              "fontSize": 20
+            }
+          }
+        },
+        {
+          "type": "TEXT",
+          "name": "Subtitle",
+          "text": {
+            "content": "Dibuat otomatis oleh AI melalui figma-mcp dengan Auto-Layout & Design Tokens.",
+            "color": "#A1A1AA",
+            "typography": {
+              "fontFamily": "Inter",
+              "fontWeight": "Regular",
+              "fontSize": 13
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "FRAME",
+      "name": "ButtonGroupRow",
+      "layout": {
+        "layoutMode": "HORIZONTAL",
+        "itemSpacing": 14,
+        "primaryAxisAlignItems": "CENTER",
+        "counterAxisAlignItems": "CENTER",
+        "primaryAxisSizingMode": "AUTO",
+        "counterAxisSizingMode": "AUTO"
+      },
+      "style": { "fills": [] },
+      "children": [
+        {
+          "type": "BUTTON",
+          "name": "PrimaryButton",
+          "content": "🚀 Get Started",
+          "style": {
+            "fills": [
+              {
+                "type": "SOLID",
+                "color": "#4F46E5"
+              }
+            ],
+            "cornerRadius": 10
+          }
+        },
+        {
+          "type": "BUTTON",
+          "name": "SuccessButton",
+          "content": "✓ Confirm & Save",
+          "style": {
+            "fills": [
+              {
+                "type": "SOLID",
+                "color": "#10B981"
+              }
+            ],
+            "cornerRadius": 10
+          }
+        },
+        {
+          "type": "BUTTON",
+          "name": "SecondaryOutlineButton",
+          "content": "Learn More",
+          "style": {
+            "fills": [
+              {
+                "type": "SOLID",
+                "color": "#18181B"
+              }
+            ],
+            "strokes": [
+              {
+                "type": "SOLID",
+                "color": "#3F3F46"
+              }
+            ],
+            "strokeWeight": 1,
+            "cornerRadius": 10
+          }
+        },
+        {
+          "type": "BUTTON",
+          "name": "DestructiveButton",
+          "content": "Delete Project",
+          "style": {
+            "fills": [
+              {
+                "type": "SOLID",
+                "color": "#EF4444"
+              }
+            ],
+            "cornerRadius": 10
+          }
+        }
+      ]
+    }
+  ]
+}
