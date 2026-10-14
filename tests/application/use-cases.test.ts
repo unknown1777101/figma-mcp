@@ -39,6 +39,9 @@ class MockBridge implements IFigmaBridge {
     action: BridgeAction,
     payload?: TReq
   ): Promise<TRes> {
+    if (!this.connected) {
+      throw new BridgeConnectionError('Mock bridge not connected');
+    }
     this.actionsReceived.push({ action, payload });
 
     if (action === 'RENDER_LAYOUT') {

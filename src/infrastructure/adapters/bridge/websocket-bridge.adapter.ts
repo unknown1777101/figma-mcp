@@ -57,7 +57,7 @@ export class WebSocketBridgeAdapter implements IFigmaBridge {
           this.clients.add(ws);
 
           ws.on('message', (data: string | Buffer) => {
-            this.handleIncomingMessage(data.toString());
+            this.handleIncomingMessage(data.toString(), ws);
           });
 
           ws.on('close', () => {

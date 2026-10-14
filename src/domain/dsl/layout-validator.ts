@@ -41,10 +41,7 @@ export class LayoutValidator {
     if (typeof n.x === 'number') validated.x = n.x;
     if (typeof n.y === 'number') validated.y = n.y;
 
-    if (upperType === 'TEXT') {
-      if (!n.text && typeof n.content !== 'string') {
-        throw new ValidationError(`Text node at '${path}' must have 'text' or 'content' field`);
-      }
+    if (upperType === 'TEXT' || upperType === 'BUTTON') {
       if (typeof n.content === 'string') {
         validated.text = { content: n.content };
       } else if (n.text && typeof n.text === 'object') {
@@ -54,6 +51,8 @@ export class LayoutValidator {
           color: (t.color as any) || undefined,
           typography: (t.typography as any) || undefined
         };
+      } else if (upperType === 'TEXT') {
+        throw new ValidationError(`Text node at '${path}' must have 'text' or 'content' field`);
       }
     }
 
