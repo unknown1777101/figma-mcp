@@ -3,6 +3,7 @@ import { AesCryptoService } from '../../infrastructure/adapters/crypto/aes-crypt
 import { FileConfigRepository } from '../../infrastructure/adapters/config/file-config.repository.js';
 import { WebSocketBridgeAdapter } from '../../infrastructure/adapters/bridge/websocket-bridge.adapter.js';
 import { PluginPackagerAdapter } from '../../infrastructure/adapters/plugin/plugin-packager.adapter.js';
+import { PlaywrightHeadlessAdapter } from '../../infrastructure/adapters/browser/playwright-headless.adapter.js';
 import { McpServerAdapter } from '../../infrastructure/adapters/mcp/mcp-server.adapter.js';
 
 import { StartBridgeUseCase } from '../../application/use-cases/start-bridge.use-case.js';
@@ -11,6 +12,7 @@ import { RenderUiUseCase } from '../../application/use-cases/render-ui.use-case.
 import { GetSelectionUseCase } from '../../application/use-cases/get-selection.use-case.js';
 import { ManageConfigUseCase } from '../../application/use-cases/manage-config.use-case.js';
 import { ExportPluginUseCase } from '../../application/use-cases/export-plugin.use-case.js';
+import { LaunchHeadlessUseCase } from '../../application/use-cases/launch-headless.use-case.js';
 
 import { createBridgeCommand } from './commands/bridge.command.js';
 import { createServeCommand } from './commands/serve.command.js';
@@ -19,6 +21,7 @@ import { createRenderCommand } from './commands/render.command.js';
 import { createAuthCommand } from './commands/auth.command.js';
 import { createPluginCommand } from './commands/plugin.command.js';
 import { createConfigCommand } from './commands/config.command.js';
+import { createHeadlessCommand } from './commands/headless.command.js';
 import { renderFullHelp } from './ui/help/full-help.js';
 import { Logger } from './ui/logger.js';
 
@@ -28,6 +31,7 @@ export function createProgram(customConfigPath?: string): Command {
   const configRepo = new FileConfigRepository(customConfigPath);
   const bridgeAdapter = new WebSocketBridgeAdapter();
   const pluginPackager = new PluginPackagerAdapter();
+  const headlessRunner = new PlaywrightHeadlessAdapter();
 
   // 2. Instantiate Use Cases
   const startBridgeUseCase = new StartBridgeUseCase(bridgeAdapter);
@@ -35,6 +39,7 @@ export function createProgram(customConfigPath?: string): Command {
   const getSelectionUseCase = new GetSelectionUseCase(bridgeAdapter);
   const manageConfigUseCase = new ManageConfigUseCase(configRepo, cryptoService);
   const exportPluginUseCase = new ExportPluginUseCase(pluginPackager);
+  const launchHeadlessUseCase = new LaunchHeadlessUseCase(headlessRunner);
 
   const mcpServerAdapter = new McpServerAdapter(
     bridgeAdapter,
@@ -64,6 +69,7 @@ export function createProgram(customConfigPath?: string): Command {
   program.addCommand(createAuthCommand(manageConfigUseCase, getLang));
   program.addCommand(createPluginCommand(exportPluginUseCase, getLang));
   program.addCommand(createConfigCommand(manageConfigUseCase, getLang));
+  program.addCommand(createHeadlessCommand(launchHeadlessUseCase, manageConfigUseCase, getLang));
 
   // Lifecycle uninstall command
   program

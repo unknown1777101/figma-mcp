@@ -31,6 +31,7 @@ describe('Presentation CLI Layer & Help System', () => {
     assert.ok(commandNames.includes('render'));
     assert.ok(commandNames.includes('auth'));
     assert.ok(commandNames.includes('plugin'));
+    assert.ok(commandNames.includes('headless'));
     assert.ok(commandNames.includes('config'));
     assert.ok(commandNames.includes('uninstall'));
   });

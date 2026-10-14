@@ -4,6 +4,7 @@ import { getMcpHelp } from './mcp-help.js';
 import { getRenderHelp } from './render-help.js';
 import { getAuthHelp } from './auth-help.js';
 import { getPluginHelp } from './plugin-help.js';
+import { getHeadlessHelp } from './headless-help.js';
 import { getConfigHelp } from './config-help.js';
 
 export function getAllDomainDocs(lang: SupportedLanguage = 'en'): DomainHelpDoc[] {
@@ -13,6 +14,7 @@ export function getAllDomainDocs(lang: SupportedLanguage = 'en'): DomainHelpDoc[
     getRenderHelp(lang),
     getAuthHelp(lang),
     getPluginHelp(lang),
+    getHeadlessHelp(lang),
     getConfigHelp(lang),
   ];
 }
