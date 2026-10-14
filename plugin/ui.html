@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Figma MCP Bridge</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Inter, system-ui, -apple-system, sans-serif;
+    }
+    body {
+      background: #1E1E1E;
+      color: #E0E0E0;
+      padding: 14px;
+      font-size: 12px;
+      user-select: none;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #333;
+    }
+    .title {
+      font-weight: 600;
+      font-size: 13px;
+      color: #FFF;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-weight: 500;
+    }
+    .badge.connected {
+      background: rgba(34, 197, 94, 0.2);
+      color: #4ADE80;
+    }
+    .badge.disconnected {
+      background: rgba(239, 68, 68, 0.2);
+      color: #F87171;
+    }
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+    .badge.connected .dot { background: #4ADE80; }
+    .badge.disconnected .dot { background: #F87171; }
+    .info {
+      font-size: 11px;
+      color: #888;
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+    .log-box {
+      background: #141414;
+      border: 1px solid #2B2B2B;
+      border-radius: 6px;
+      padding: 8px;
+      height: 52px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 10px;
+      color: #AAA;
+    }
+    .log-entry {
+      margin-bottom: 3px;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+    .log-entry.success { color: #4ADE80; }
+    .log-entry.error { color: #F87171; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="title">
+      <span>⚡ Figma MCP</span>
+    </div>
+    <div id="statusBadge" class="badge disconnected">
+      <span class="dot"></span>
+      <span id="statusText">Disconnected</span>
+    </div>
+  </div>
+
+  <div class="info" id="bridgeUrl">Connecting to ws://localhost:9099...</div>
+
+  <div class="log-box" id="logBox">
+    <div class="log-entry">Waiting for local bridge...</div>
+  </div>
+
+  <script>
+    const WS_URL = 'ws://localhost:9099';
+    let socket = null;
+    let reconnectTimer = null;
+    let cachedMetadata = null;
+
+    const statusBadge = document.getElementById('statusBadge');
+    const statusText = document.getElementById('statusText');
+    const bridgeUrl = document.getElementById('bridgeUrl');
+    const logBox = document.getElementById('logBox');
+
+    function log(msg, type = '') {
+      const entry = document.createElement('div');
+      entry.className = 'log-entry ' + type;
+      const time = new Date().toLocaleTimeString();
+      entry.textContent = `[${time}] ${msg}`;
+      logBox.appendChild(entry);
+      logBox.scrollTop = logBox.scrollHeight;
+    }
+
+    function connect() {
+      if (socket && (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) {
+        return;
+      }
+
+      bridgeUrl.textContent = `Target: ${WS_URL}`;
+
+      try {
+        socket = new WebSocket(WS_URL);
+
+        socket.onopen = () => {
+          statusBadge.className = 'badge connected';
+          statusText.textContent = 'Connected';
+          log('Connected to local bridge', 'success');
+
+          // Send metadata if available
+          if (cachedMetadata) {
+            socket.send(JSON.stringify({
+              id: 'meta-init',
+              action: 'GET_STATUS',
+              data: cachedMetadata
+            }));
+          }
+        };
+
+        socket.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            log(`Action: ${data.action || 'unknown'}`);
+            // Forward to Figma Sandbox
+            parent.postMessage({ pluginMessage: data }, '*');
+          } catch (e) {
+            log('Bad message from bridge', 'error');
+          }
+        };
+
+        socket.onclose = () => {
+          statusBadge.className = 'badge disconnected';
+          statusText.textContent = 'Disconnected';
+          scheduleReconnect();
+        };
+
+        socket.onerror = () => {
+          statusBadge.className = 'badge disconnected';
+          statusText.textContent = 'Error';
+          scheduleReconnect();
+        };
+      } catch (err) {
+        scheduleReconnect();
+      }
+    }
+
+    function scheduleReconnect() {
+      if (reconnectTimer) return;
+      reconnectTimer = setTimeout(() => {
+        reconnectTimer = null;
+        connect();
+      }, 3000);
+    }
+
+    // Messages received from Figma Sandbox (code.ts)
+    window.onmessage = (event) => {
+      const msg = event.data?.pluginMessage;
+      if (!msg) return;
+
+      if (msg.action === 'GET_STATUS' && msg.data) {
+        cachedMetadata = msg.data;
+      }
+
+      if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify(msg));
+        if (msg.success !== undefined) {
+          log(`Sent reply (${msg.action}): ${msg.success ? 'OK' : 'FAIL'}`, msg.success ? 'success' : 'error');
+        }
+      }
+    };
+
+    // Initial connection attempt
+    connect();
+  </script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+{
+  "type": "FRAME",
+  "name": "ProductCard",
+  "width": 360,
+  "layout": {
+    "layoutMode": "VERTICAL",
+    "padding": 24,
+    "itemSpacing": 16,
+    "primaryAxisAlignItems": "MIN",
+    "counterAxisAlignItems": "MIN",
+    "primaryAxisSizingMode": "AUTO",
+    "counterAxisSizingMode": "FIXED"
+  },
+  "style": {
+    "fills": [
+      {
+        "type": "SOLID",
+        "color": "#FFFFFF"
+      }
+    ],
+    "strokes": [
+      {
+        "type": "SOLID",
+        "color": "#E2E8F0"
+      }
+    ],
+    "strokeWeight": 1,
+    "cornerRadius": 16,
+    "effects": [
+      {
+        "type": "DROP_SHADOW",
+        "color": "#0000000D",
+        "offset": { "x": 0, "y": 8 },
+        "radius": 24
+      }
+    ]
+  },
+  "children": [
+    {
+      "type": "RECTANGLE",
+      "name": "ImageCover",
+      "width": 312,
+      "height": 180,
+      "style": {
+        "fills": [
+          {
+            "type": "SOLID",
+            "color": "#EEF2FF"
+          }
+        ],
+        "cornerRadius": 8
+      }
+    },
+    {
+      "type": "TEXT",
+      "name": "CategoryBadge",
+      "text": {
+        "content": "FEATURED COMPONENT",
+        "color": "#4F46E5",
+        "typography": {
+          "fontFamily": "Inter",
+          "fontWeight": "Bold",
+          "fontSize": 11,
+          "letterSpacing": 0.5
+        }
+      }
+    },
+    {
+      "type": "TEXT",
+      "name": "CardTitle",
+      "text": {
+        "content": "AI-Powered UI Generator",
+        "color": "#0F172A",
+        "typography": {
+          "fontFamily": "Inter",
+          "fontWeight": "Bold",
+          "fontSize": 20
+        }
+      }
+    },
+    {
+      "type": "TEXT",
+      "name": "Description",
+      "text": {
+        "content": "Craft declarative layouts, buttons, and design tokens directly onto your Figma canvas in realtime using MCP.",
+        "color": "#64748B",
+        "typography": {
+          "fontFamily": "Inter",
+          "fontWeight": "Regular",
+          "fontSize": 14,
+          "lineHeight": 20
+        }
+      }
+    },
+    {
+      "type": "BUTTON",
+      "name": "PrimaryCTA",
+      "content": "Generate Layout in Figma",
+      "style": {
+        "fills": [
+          {
+            "type": "SOLID",
+            "color": "#4F46E5"
+          }
+        ],
+        "cornerRadius": 10
+      }
+    }
+  ]
+}
