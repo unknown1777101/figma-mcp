@@ -207,6 +207,9 @@ function applyAutoLayout(frame: any, layout: any) {
 
 // Recursive Node Renderer
 async function renderNode(spec: any, parent?: BaseNode & ChildrenMixin): Promise<SceneNode> {
+  if (!spec) {
+    throw new Error('renderNode received empty specification');
+  }
   const type = (spec.type || 'FRAME').toUpperCase();
   let createdNode: SceneNode;
 

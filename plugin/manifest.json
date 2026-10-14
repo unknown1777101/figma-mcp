@@ -7,6 +7,6 @@
   "editorType": ["figma", "figjam"],
   "networkAccess": {
     "allowedDomains": ["none"],
-    "devAllowedDomains": ["ws://localhost:*", "http://localhost:*"]
+    "devAllowedDomains": ["ws://localhost:9099", "http://localhost:9099"]
   }
 }

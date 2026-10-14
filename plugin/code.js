@@ -197,6 +197,9 @@ function applyAutoLayout(frame, layout) {
 }
 // Recursive Node Renderer
 async function renderNode(spec, parent) {
+    if (!spec) {
+        throw new Error('renderNode received empty specification');
+    }
     const type = (spec.type || 'FRAME').toUpperCase();
     let createdNode;
     if (type === 'TEXT') {

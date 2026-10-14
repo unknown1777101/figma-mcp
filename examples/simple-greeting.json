@@ -1,0 +1,96 @@
+{
+  "type": "FRAME",
+  "name": "SimpleNotificationCard",
+  "width": 320,
+  "layout": {
+    "layoutMode": "VERTICAL",
+    "padding": 20,
+    "itemSpacing": 12,
+    "primaryAxisAlignItems": "CENTER",
+    "counterAxisAlignItems": "CENTER",
+    "primaryAxisSizingMode": "AUTO",
+    "counterAxisSizingMode": "FIXED"
+  },
+  "style": {
+    "fills": [
+      {
+        "type": "SOLID",
+        "color": "#18181B"
+      }
+    ],
+    "strokes": [
+      {
+        "type": "SOLID",
+        "color": "#27272A"
+      }
+    ],
+    "strokeWeight": 1,
+    "cornerRadius": 16,
+    "effects": [
+      {
+        "type": "DROP_SHADOW",
+        "color": "#00000040",
+        "offset": { "x": 0, "y": 8 },
+        "radius": 20
+      }
+    ]
+  },
+  "children": [
+    {
+      "type": "TEXT",
+      "name": "Badge",
+      "text": {
+        "content": "⚡ FIGMA MCP CONNECTED",
+        "color": "#10B981",
+        "typography": {
+          "fontFamily": "Inter",
+          "fontWeight": "Bold",
+          "fontSize": 11,
+          "letterSpacing": 0.5
+        }
+      }
+    },
+    {
+      "type": "TEXT",
+      "name": "Title",
+      "text": {
+        "content": "Hello from AI Assistant!",
+        "color": "#FFFFFF",
+        "typography": {
+          "fontFamily": "Inter",
+          "fontWeight": "Bold",
+          "fontSize": 18
+        }
+      }
+    },
+    {
+      "type": "TEXT",
+      "name": "Subtitle",
+      "text": {
+        "content": "Komponen ini digambar langsung secara otomatis via figma-mcp bridge ke canvas Figma kamu.",
+        "color": "#A1A1AA",
+        "typography": {
+          "fontFamily": "Inter",
+          "fontWeight": "Regular",
+          "fontSize": 13,
+          "lineHeight": 18,
+          "textAlignHorizontal": "CENTER"
+        }
+      }
+    },
+    {
+      "type": "BUTTON",
+      "name": "ConfirmBtn",
+      "content": "Bagus, Berhasil!",
+      "style": {
+        "fills": [
+          {
+            "type": "SOLID",
+            "color": "#10B981"
+          }
+        ],
+        "cornerRadius": 8
+      }
+    }
+  ]
+}

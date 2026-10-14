@@ -117,12 +117,17 @@ export class WebSocketBridgeAdapter implements IFigmaBridge {
     payload?: TReq,
     timeoutMs: number = 30000
   ): Promise<TRes> {
-    if (!this.isConnected()) {
-      throw new BridgeConnectionError(
-        'No active Figma Plugin connected. Open Figma, run the Figma MCP Bridge plugin, and try again.'
-      );
+    if (this.clients.size > 0) {
+      return this.sendToLocalClients<TReq, TRes>(action, payload, timeoutMs);
     }
+    return this.sendViaRemoteBridge<TReq, TRes>(action, payload, timeoutMs);
+  }
 
+  private async sendToLocalClients<TReq, TRes>(
+    action: BridgeAction,
+    payload?: TReq,
+    timeoutMs: number = 30000
+  ): Promise<TRes> {
     const requestId = crypto.randomUUID();
     const req: BridgeRequest<TReq> = {
       id: requestId,
@@ -161,11 +166,84 @@ export class WebSocketBridgeAdapter implements IFigmaBridge {
     });
   }
 
-  private handleIncomingMessage(rawMessage: string): void {
-    try {
-      const parsed: BridgeResponse = JSON.parse(rawMessage);
+  private async sendViaRemoteBridge<TReq, TRes>(
+    action: BridgeAction,
+    payload?: TReq,
+    timeoutMs: number = 30000
+  ): Promise<TRes> {
+    return new Promise<TRes>((resolve, reject) => {
+      let clientWs: WebSocket;
+      try {
+        clientWs = new WebSocket(`ws://localhost:${this.port}`);
+      } catch (err: any) {
+        return reject(
+          new BridgeConnectionError(
+            'Figma Plugin is not connected to the local bridge. Please launch the Figma Desktop plugin and connect.'
+          )
+        );
+      }
 
-      // Metadata sync message
+      const timer = setTimeout(() => {
+        try {
+          clientWs.close();
+        } catch {}
+        reject(new FigmaPluginTimeoutError(action, timeoutMs));
+      }, timeoutMs);
+
+      clientWs.on('open', () => {
+        const requestId = crypto.randomUUID();
+        const req: BridgeRequest<TReq> = {
+          id: requestId,
+          action,
+          payload,
+          timestamp: Date.now(),
+        };
+
+        clientWs.on('message', (msgData: string | Buffer) => {
+          try {
+            const resp: BridgeResponse = JSON.parse(msgData.toString());
+            if (resp.id === requestId) {
+              clearTimeout(timer);
+              clientWs.close();
+              if (resp.success) {
+                resolve(resp.data as TRes);
+              } else {
+                reject(new DomainError(resp.error || `Action ${action} failed in Figma`));
+              }
+            }
+          } catch {}
+        });
+
+        clientWs.send(JSON.stringify(req));
+      });
+
+      clientWs.on('error', () => {
+        clearTimeout(timer);
+        reject(
+          new BridgeConnectionError(
+            'Figma Plugin is not connected to the local bridge. Please launch the Figma Desktop plugin and connect.'
+          )
+        );
+      });
+    });
+  }
+
+  private handleIncomingMessage(rawMessage: string, senderWs?: WebSocket): void {
+    try {
+      const parsed: any = JSON.parse(rawMessage);
+
+      // 1. If it's a REQUEST from a client (e.g. render CLI) waiting for execution by the plugin
+      if (parsed.action && parsed.id && parsed.payload !== undefined && parsed.success === undefined) {
+        // Forward ONLY to other sockets (i.e. Figma Plugin)
+        for (const client of this.clients) {
+          if (client !== senderWs && client.readyState === WebSocket.OPEN) {
+            client.send(rawMessage);
+          }
+        }
+        return;
+      }
+
+      // 2. Metadata sync message from Figma plugin
       if (parsed.action === 'GET_STATUS' && parsed.data) {
         const d = parsed.data as any;
         if (d.version) this.pluginMetadata.version = d.version;
@@ -173,16 +251,25 @@ export class WebSocketBridgeAdapter implements IFigmaBridge {
         if (d.activePageName) this.pluginMetadata.activePageName = d.activePageName;
       }
 
-      // Check if it correlates to a pending action request
-      const pending = this.pendingRequests.get(parsed.id);
-      if (pending) {
-        clearTimeout(pending.timer);
-        this.pendingRequests.delete(parsed.id);
+      // 3. If it's a RESPONSE from the Figma plugin (has parsed.success !== undefined)
+      if (parsed.success !== undefined) {
+        const pending = this.pendingRequests.get(parsed.id);
+        if (pending) {
+          clearTimeout(pending.timer);
+          this.pendingRequests.delete(parsed.id);
 
-        if (parsed.success) {
-          pending.resolve(parsed.data);
-        } else {
-          pending.reject(new DomainError(parsed.error || `Action ${pending.action} failed in Figma`));
+          if (parsed.success) {
+            pending.resolve(parsed.data);
+          } else {
+            pending.reject(new DomainError(parsed.error || `Action ${pending.action} failed in Figma`));
+          }
+        }
+
+        // Forward response back to the requester client
+        for (const client of this.clients) {
+          if (client !== senderWs && client.readyState === WebSocket.OPEN) {
+            client.send(rawMessage);
+          }
         }
       }
     } catch {

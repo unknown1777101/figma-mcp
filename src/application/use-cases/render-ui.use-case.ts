@@ -10,12 +10,6 @@ export class RenderUiUseCase implements IRenderUiUseCase {
   async execute(node: unknown, timeoutMs: number = 30000): Promise<RenderResult> {
     const validatedNode = LayoutValidator.validate(node);
 
-    if (!this.bridge.isConnected()) {
-      throw new BridgeConnectionError(
-        'Figma Plugin is not connected to the local bridge. Please launch the Figma Desktop plugin and connect.'
-      );
-    }
-
     const result = await this.bridge.sendAction<unknown, RenderResult>(
       'RENDER_LAYOUT',
       validatedNode,

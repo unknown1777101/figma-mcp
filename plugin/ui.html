@@ -150,8 +150,10 @@
           try {
             const data = JSON.parse(event.data);
             log(`Action: ${data.action || 'unknown'}`);
-            // Forward to Figma Sandbox
-            parent.postMessage({ pluginMessage: data }, '*');
+            // Forward to Figma Sandbox only if it's an actionable request
+            if (data.action && data.id && data.success === undefined) {
+              parent.postMessage({ pluginMessage: data }, '*');
+            }
           } catch (e) {
             log('Bad message from bridge', 'error');
           }

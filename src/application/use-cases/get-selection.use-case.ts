@@ -7,12 +7,6 @@ export class GetSelectionUseCase implements IGetSelectionUseCase {
   constructor(private readonly bridge: IFigmaBridge) {}
 
   async execute(timeoutMs: number = 10000): Promise<SelectionNodeInfo[]> {
-    if (!this.bridge.isConnected()) {
-      throw new BridgeConnectionError(
-        'Figma Plugin is not connected to the local bridge. Please launch the Figma Desktop plugin and connect.'
-      );
-    }
-
     const result = await this.bridge.sendAction<void, SelectionNodeInfo[]>(
       'GET_SELECTION',
       undefined,
